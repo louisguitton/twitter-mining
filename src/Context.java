@@ -21,8 +21,16 @@ public class Context {
 		mGraph.addVertex(tag);
 	}
 	
+	public synchronized boolean doesVertexExist(String tag){
+		return mTagsCombination.contains(tag);
+	}
+	
 	public synchronized void addEdge(String tag1, String tag2){
 		mGraph.addEdge(tag1, tag2);
+	}
+	
+	public synchronized boolean doesEdgeExist(String tag1,String tag2){
+		return mGraph.containsEdge(tag1, tag2);
 	}
 	
 	public void incrementEdgeWeight(String tag1, String tag2){

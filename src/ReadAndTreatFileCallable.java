@@ -40,7 +40,7 @@ public class ReadAndTreatFileCallable implements Callable<Void>{
 					tags.add((String) ((JSONObject) hashtags.get(i)).get("text"));
 				}
 				for(String tag : tags){
-					if(!mContext)
+					
 
 				}
 			}
