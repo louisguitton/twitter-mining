@@ -32,14 +32,24 @@ public class ReadAndTreatFileCallable implements Callable<Void>{
 				jsonObjects.add((JSONObject) JSONValue.parse(responseStrBuilder.toString()));
 			JSONObject entities;
 			JSONArray hashtags;
-			ArrayList<String> tags = new ArrayList<String>();
 			for(JSONObject tweet : jsonObjects){
 				entities = (JSONObject) tweet.get("entities");
 				hashtags = (JSONArray) entities.get("hashtags");
+				ArrayList<String> tags = new ArrayList<String>();
+
 				for(int i = 0; i < hashtags.size(); i++){
-					tags.add((String) ((JSONObject) hashtags.get(i)).get("text"));
+					tags.add(((String) ((JSONObject) hashtags.get(i)).get("text")).toLowerCase());
 				}
-				for(String tag : tags){
+				for(int i = 0; i < tags.size(); i++){
+					String tag = tags.get(i);
+					if(!mContext.doesVertexExist(tag)){
+						mContext.addVertex(tag);
+					}
+					for(int j = i-1; j >= 0; j--){
+						if(!mContext.doesEdgeExist(tag, tags.get(j))){
+							mContext.addEdge(tag, tags.get(j));
+						}
+					}
 					
 
 				}

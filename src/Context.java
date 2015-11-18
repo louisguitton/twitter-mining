@@ -22,7 +22,7 @@ public class Context {
 	}
 	
 	public synchronized boolean doesVertexExist(String tag){
-		return mTagsCombination.contains(tag);
+		return mGraph.containsVertex(tag);
 	}
 	
 	public synchronized void addEdge(String tag1, String tag2){
