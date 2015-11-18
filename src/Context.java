@@ -38,7 +38,7 @@ public class Context {
 		Context c = new Context();
 		for(File f : children){
 			if(!f.isDirectory()){
-				c.mExecutor.submit(new ReadAndTreatFileCallable(f));
+				c.mExecutor.submit(new ReadAndTreatFileCallable(f, c));
 			}
 		}
 		c.mExecutor.shutdown();
