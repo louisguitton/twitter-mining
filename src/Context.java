@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -28,7 +29,8 @@ public class Context {
 	private ExecutorService mExecutor;
 	private HashSet<String> mTagsCombination = new HashSet<String>();
 	private SimpleWeightedGraph<String, DefaultWeightedEdge> mGraph = new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
-	
+	static HashMap<String, Integer> mTweetsPerTags = new HashMap<String, Integer>();
+
 	public Context(){
 		mExecutor = Executors.newFixedThreadPool(LocalConf.NB_CORES);	
 	}
@@ -107,7 +109,9 @@ public class Context {
 		streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 		String inputStr;
 		while ((inputStr = streamReader.readLine()) != null){
-			this.addVertex(inputStr.trim());
+			String[] split = inputStr.split(" ");
+			this.addVertex(split[0]);
+			mTweetsPerTags.put(split[0], Integer.parseInt(split[1]));
 		}
 		
 		
@@ -166,7 +170,7 @@ public class Context {
 	}
 	
 	public static void main(String[] args) {
-//		readAndSerializeData();
+		readAndSerializeData();
 		readAndFindDensest();
 	}
 	
@@ -181,7 +185,7 @@ public class Context {
 		public Void call() throws Exception {
 			Collection<String> vertexes = mGraph.vertexSet();
 			for(String vertex : vertexes){
-				mOut.write(vertex+"\n");
+				mOut.write(vertex+" " + ReadAndTreatFileCallable.getOccurrencesForTag(vertex)+"\n");
 			}
 			mOut.flush();
 			mOut.close();
@@ -206,5 +210,8 @@ public class Context {
 			return null;
 		}
 		
+	}
+	public static int getOccurrencesForTag(String tag){
+		return mTweetsPerTags.get(tag);
 	}
 }

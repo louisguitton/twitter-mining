@@ -97,7 +97,7 @@ public class GraphManager<K, E> {
 		try {
 			BufferedWriter dout = new BufferedWriter(new FileWriter(d));
 			for(K v : mDensestSubgraph){
-				dout.write(v.toString() + " ");
+				dout.write(v.toString() + ": " + Context.getOccurrencesForTag(v.toString()) + " ");
 				
 			}
 			dout.write(mDensity + " ");
@@ -117,11 +117,9 @@ public class GraphManager<K, E> {
 			findDensestSubgraph();
 			postProcessDensestSubgraph(i);
 			for(K v : this.mDensestSubgraph){
-				for (K targetV: this.mDensestSubgraph){
-					if(!(targetV==v)){
-						mGraph.removeEdge(v, targetV);
-					}
-				}
+				Collection<E> edgesOf = new HashSet<E>();
+				edgesOf.addAll(mGraph.edgesOf(v));
+				mGraph.removeAllEdges(edgesOf);
 				mGraph.removeVertex(v);
 			}
 			mRemovedVertices.clear();

@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
@@ -20,6 +21,8 @@ public class ReadAndTreatFileCallable implements Callable<Void>{
 	File mFile;
 	Context mContext;
 	static int tweets = 0;
+	static HashMap<String, Integer> mTweetsPerTags = new HashMap<String, Integer>();
+	
 	public ReadAndTreatFileCallable(File f, Context c){
 		mFile = f;
 		mContext = c;
@@ -84,6 +87,10 @@ public class ReadAndTreatFileCallable implements Callable<Void>{
 				}*/
 				for(int i = 0; i < tags.size(); i++){
 					String tag = tags.get(i);
+					if(!mTweetsPerTags.containsKey(tag)){
+						mTweetsPerTags.put(tag, 0);
+					}
+					mTweetsPerTags.put(tag, mTweetsPerTags.get(tag)+1);
 					if(!mContext.doesVertexExist(tag)){
 						mContext.addVertex(tag);
 					}
@@ -119,6 +126,10 @@ public class ReadAndTreatFileCallable implements Callable<Void>{
 
 		return null;
 
+	}
+	
+	public static int getOccurrencesForTag(String tag){
+		return mTweetsPerTags.get(tag);
 	}
 
 }
