@@ -1,2 +1,7 @@
 LocalConf.java
+/Context$WriteEdges.class
+/Context$WriteVertexes.class
+/Context.class
+/GraphManager.class
 /LocalConf.class
+/ReadAndTreatFileCallable.class

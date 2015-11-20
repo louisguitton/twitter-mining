@@ -82,13 +82,17 @@ public class Context {
 			WriteVertexes w1 = new WriteVertexes(vout);
 			WriteEdges w2 = new WriteEdges(eout);
 			ExecutorService executor = Executors.newFixedThreadPool(LocalConf.NB_CORES);
-			executor.submit(w1);
+			executor.submit(w1);	
 			executor.submit(w2);
 			executor.shutdown();
+			executor.awaitTermination(100, TimeUnit.SECONDS);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -132,7 +136,7 @@ public class Context {
 		}
 		c.mExecutor.shutdown();
 		try {
-			c.mExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+			c.mExecutor.awaitTermination(300, TimeUnit.SECONDS);
 			System.out.println(ReadAndTreatFileCallable.getNumberTweets() + " tweets");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -143,7 +147,7 @@ public class Context {
 		c.serializeGraph();
 	}
 	
-	public static void main(String[] args) {
+	public static void readAndFindDensest(){
 		File v = new File(LocalConf.SAVE_PATH + "vertexes");
 		File e = new File(LocalConf.SAVE_PATH + "edges");
 		Context c = new Context();
@@ -157,10 +161,15 @@ public class Context {
 		}
 		
 		
-		GraphManager gm = new GraphManager(c.mGraph,0.1);
-		gm.findDensestSubgraph();
-		
+		GraphManager gm = new GraphManager<String, DefaultWeightedEdge>(c.mGraph,0.5);
+		gm.wrapper();
 	}
+	
+	public static void main(String[] args) {
+//		readAndSerializeData();
+		readAndFindDensest();
+	}
+	
 	
 	
 	class WriteVertexes implements Callable<Void>{
@@ -174,6 +183,8 @@ public class Context {
 			for(String vertex : vertexes){
 				mOut.write(vertex+"\n");
 			}
+			mOut.flush();
+			mOut.close();
 			return null;
 		}
 		
@@ -190,6 +201,8 @@ public class Context {
 			for(DefaultWeightedEdge e : edges){
 				mOut.write(mGraph.getEdgeSource(e) + " " + mGraph.getEdgeTarget(e) + " " + mGraph.getEdgeWeight(e)+"\n");
 			}
+			mOut.flush();
+			mOut.close();
 			return null;
 		}
 		
