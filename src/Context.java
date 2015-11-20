@@ -1,10 +1,15 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -15,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 public class Context {
 	
@@ -88,7 +95,33 @@ public class Context {
 
 	}
 	
-	public static void main(String[] args){
+	public void readSerializedFileAndCreateGraph(File v, File e) throws IOException{
+//		new ReadAndTreatFileCallable(v, c);
+		System.out.println("Reading file: " + v.getName());
+		FileInputStream in = new FileInputStream(v);
+		BufferedReader streamReader;
+		streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+		String inputStr;
+		while ((inputStr = streamReader.readLine()) != null){
+			this.addVertex(inputStr.trim());
+		}
+		
+		
+//		new ReadAndTreatFileCallable(e, c);
+		System.out.println("Reading file: " + e.getName());
+		in = new FileInputStream(e);
+		streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+		while ((inputStr = streamReader.readLine()) != null){
+			String [] line = inputStr.split(" ");
+			String tag1 = line[0];
+			String tag2 = line[1];
+			double weight = Double.parseDouble(line[2]);
+			DefaultWeightedEdge edge = this.mGraph.addEdge(tag1,tag2);
+			this.mGraph.setEdgeWeight(edge, weight);
+		}
+	}
+	
+	public static void readAndSerializeData(){
 		File file = new File(LocalConf.ROOT_PATH);
 		File[] children = file.listFiles();
 		Context c = new Context();
@@ -108,6 +141,25 @@ public class Context {
 		System.out.println("nb of edges: " + c.mGraph.edgeSet().size());
 		System.out.println("nb of vertexes: " + c.mGraph.vertexSet().size());
 		c.serializeGraph();
+	}
+	
+	public static void main(String[] args) {
+		File v = new File(LocalConf.SAVE_PATH + "vertexes");
+		File e = new File(LocalConf.SAVE_PATH + "edges");
+		Context c = new Context();
+		
+		
+		try {
+			c.readSerializedFileAndCreateGraph(v,e);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+		GraphManager gm = new GraphManager(c.mGraph,0.1);
+		gm.findDensestSubgraph();
+		
 	}
 	
 	
